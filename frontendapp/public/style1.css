@@ -1,7 +1,7 @@
 
 .nav-item{color:rgb(80, 120, 143) ;}
 
-.category-box{color:rgb(255, 255, 255); }
+.category-box{color:white;  }
 
 .category-box:hover{ background:rgb(80, 120, 143); color: white}
 .content-box{background:rgb(0, 0, 0); ;}
