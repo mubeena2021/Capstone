@@ -1,14 +1,13 @@
-
-.nav-item{color:rgb(80, 120, 143) ;}
-
-.category-box{color:white;  }
-
-.category-box:hover{ background:rgb(80, 120, 143); color: white}
+.nav-item{color:rgb(20, 120, 182)}
+span:hover{font-size: 21px; cursor: pointer;}
+.category-box{color:white; }
+.category-box:hover{ background:rgb(20, 120, 182); color: white; cursor: pointer;}
 .content-box{background:rgb(0, 0, 0); ;}
 .btn:hover{ font-size: 18px; }
 .btn:focus{outline: none; box-shadow: none;}
-
-
+.Q-btn{ color: white; background:rgb(20, 120, 182); height: 41px; font-size: medium; }
+.Q-btn:hover{font-size: 17px;}
+.answerBox{ color:rgb(0, 0, 0); font-family: 'Work Sans', sans-serif; font-weight: 600;}
 
 @media screen and (max-width:620px) {
     .navBox{display: flex; flex-flow:column}

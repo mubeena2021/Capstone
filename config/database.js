@@ -4,7 +4,6 @@ const {Sequelize} = require('sequelize');
 const sequelize = new Sequelize(process.env.CLEARDB_DATABASE_URL || 'mysql://root:Root12345!@localhost:3306/data', {logging: false});
 
 
-
 sequelize
     .authenticate()
     .then(() => {

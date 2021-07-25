@@ -15,8 +15,9 @@ function Mynav(){
 return(
 <>
 <div className={' navBox row bg-dark border border-light justify-content-between p-1'}>
-            <h1 className={'nav-item col-4 align-self-center '}>MyForum</h1>
-            <h4 className={'nav-item col-4 align-self-center text-white '}> Welcome! Login</h4>
+            <h1 className={'nav-item col-4 align-self-center  '}>MyForum</h1>
+            <h5 className={'nav-item col-4 align-self-center '}> Welcome! <span className={'text-white'}>Login</span></h5>
+
 </div>
 </>
 )};
@@ -25,13 +26,14 @@ return(
 function Categories(){
 
   const [categories, setCategories] = useState('');
-  const [questions, setQuestions] = useState();
+  const [questions, setQuestions] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-
+  const [answers, setAnswers] = useState({});
+  const [selectedQuestion, setSelectedQuestion] = useState('');
   const [showQuestionForm, setShowQuestionForm] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState();
+  const [showAnswerForm, setShowAnswerForm] = useState(false);
   const [txt, setQuestionTxt] = useState('');
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [txtAnswer, setAnswerText] = useState();
 
 
   const fetchCategories = async () => {
@@ -47,20 +49,16 @@ useEffect(() => {
 }, [])
 
 
-
 const fetchQuestions = async (category) => {
- // console.log(category)
-  // write code here to make a fetch call to get ALL the questions where cateogry id = category.id
-  // once fetched, write code to display it on the UI
   let res = await fetch(`http://localhost:3001/api/categories/${category.id}/questions`)
   let data = await res.json()
   console.log(data)
   setQuestions(data)
 };
+
 const switchCategory = async (category) => {
   console.log('selected category is', category)
   setSelectedCategory(category)
-  // write code here to fetch the questions for the selected category
   fetchQuestions(category)
 };
 
@@ -74,52 +72,77 @@ const createQuestion = async () => {
       },
       body: JSON.stringify({questionTxt: txt})
   })
-  let data = await res.json()
+  let data = await res.json();
+  
   fetchQuestions(selectedCategory)
   setQuestionTxt('')
   setShowQuestionForm(false)
 };
+
+const createAnswer = async () => {
+ console.log('questionTxt', txtAnswer)
+ console.log('question id is', selectedQuestion.id)
+ console.log(selectedQuestion.id) ;
+
+let res = await fetch(`http://localhost:3001/api//questions/${selectedQuestion.id}/answers`, {
+    method: 'POST',
+     headers: {
+       'Content-Type': 'application/json'
+    },
+     body: JSON.stringify({answerTxt: txtAnswer})
+  })
+ let data = await res.json();
   
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
+  setAnswerText('')
+  setShowAnswerForm(false) 
+  fetchAnswersForQuestion(selectedQuestion)
+ };
 
-  const handleOk = () => {
-    createQuestion();
-    setIsModalVisible(false);
-  };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
 
+const fetchAnswersForQuestion = async (question) => {
+ console.log('fetch the answers for the question ', question)
+ console.log(`http://localhost:3001/api/questions/${question.id}/answers`)
+ let res = await fetch(`http://localhost:3001/api/questions/${question.id}/answers`)
+  let data = await res.json()
+  console.log(data)
+  setAnswers({...answers, [question.id]: data})
+};
+
+
+const onPanelChange = async (questionId) => {
+  console.log(questionId)
+let q ;
+ questions.map((question) => { 
+     if(question.id == questionId){
+      q = question;
+   }   
+ })
+ setSelectedQuestion(q)
+ fetchAnswersForQuestion(q)
+ console.log('clicked panel')
+};
+  
 
 
 return(
-
 <>
-
-<div className={'container categoryBox d-flex flex-column bg-dark p-2 '}> 
-
+<div className={'container categoryBox d-flex flex-column border border-light bg-dark p-3'}> 
 {categories && categories.map((data, key) => {  
-  return <section className={(selectedCategory && (selectedCategory.id == data.id)) ? ' text-warning p-3 m-1 rounded': 'category-box p-3 m-1 rounded'} key={key.id}  onClick={() => switchCategory(data)}> 
+  return <section className={(selectedCategory && (selectedCategory.id == data.id)) ? 'text-warning p-3 m-1 rounded':'category-box p-3 m-1 rounded'} key={key.id} onClick={() => switchCategory(data)}> 
           {data.name}
          </section>
          }       
      )}
 </div>
 
+<div className={'container d-flex flex-column justify-content-start border border-light bg-secondary p-4'}> 
 
+{selectedCategory && <button className={"Q-btn align-self-center w-50 rounded"} onClick={() => setShowQuestionForm(true)}> New Question </button>
+}
 
-<div className={ ' container d-flex flex-column justify-content-start w-50 bg-secondary p-1 '}> 
-
-<button className={" align-self-center btn btn-info w-50 rounded"}type="primary" onClick={showModal} > 
-New Question 
-</button>
-
-
-<Modal className={'p-2 bg-secondary'} 
-title="Question" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} > 
+<Modal 
+title="Question" visible={showQuestionForm} closable={false} footer={null}> 
 <textarea 
       value={txt}
       onChange={(ev) => setQuestionTxt(ev.currentTarget.value)}
@@ -127,71 +150,64 @@ title="Question" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel
       rows={5}
       className={' p-2 border border-dark bg-dark text-white w-100 '}
        placeholder={'Enter question here...'}/>
+       <div className={'d-flex justify-content-end'}>
+       <button className={'Q-btn bg-secondary mx-3 my-2 rounded'} onClick={() => setShowQuestionForm(false)}>Cancel</button>
+       <button className={'Q-btn rounded my-2'} onClick={createQuestion}>Submit Question</button>
 
+       </div>
 </Modal>
 
+{selectedCategory ? <h5 className={'text-center p-2 '}>
+  Questions</h5> : <h5 className={'text-center p-2 text-dark'}>Select a Category to continue</h5>}
 
-{selectedCategory ? <h5 className={'text-center '}>
-  Questions</h5> : <h5 className={'text-center  text-dark'}>Select a Category to continue</h5>}
+
+  {selectedCategory && questions && questions.length>0 && <div className={'w-100 border border-dark'}>
+    <Collapse 
+     accordion
+     expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0}/>}
+     className="p-1 m-1" onChange={onPanelChange}>
+      {questions && questions.map((question) => {
+    return <Panel  header={question.questionTxt} key={question.id}> 
+    
+          <ol> {answers && answers[question.id] && answers[question.id].map((answer) => {
+                      return  <li className={'answerBox p-2 m-1'} key={answer.id}>{answer.answerTxt}</li>
+                                    })} 
+                                     </ol>                                 
+      {selectedQuestion && <button className={'Q-btn justify-content-end rounded'} onClick={() => setShowAnswerForm(true)}>New Answer</button>
+         }
  
-  <p>{JSON.stringify(selectedQuestion)}</p>
+  <Modal 
+    title="Answer" visible={showAnswerForm} closable={false} footer={null}> 
+    <textarea 
+      value={txtAnswer}
+      onChange={(ev) => setAnswerText(ev.currentTarget.value)}
+      type="text"
+      rows={5}
+      className={' p-2 border border-dark bg-dark text-white w-100 '}
+      placeholder={'Write answer here...'}/>
+      <div className={'d-flex justify-content-end'}>
+      <button className={'Q-btn bg-secondary mx-3 my-2 rounded'} onClick={() => setShowAnswerForm(false)}>Cancel</button>
+      <button className={'Q-btn rounded my-2'} onClick={createAnswer}>Submit Answer</button>
+       </div>
+   </Modal>          
 
-<Collapse
-      bordered={true}
-      defaultActiveKey={['1']}
-      expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
-      className=" m-3 site-collapse-custom-collapse"
-    >
-      <Panel header="This is panel header 1" key="1" className="site-collapse-custom-panel border border-dark">
-        <p className={''}>answer </p>
-      </Panel>
-      <Panel header="This is panel header 2" key="2" className="site-collapse-custom-panel">
-        <p></p>
-      </Panel>
-      <Panel header="This is panel header 3" key="3" className="site-collapse-custom-panel">
-        <p></p>
-      </Panel>
-  </Collapse>
+   </Panel> 
+       })}
+    </Collapse>
+</div>}
 
-
-
-
-  </div>
-
+</div>
 </>
 )};
 
   
 
-
-
-  
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
 function App() {
-
   return (
-    
    <>
     <Mynav/>
-
     <div className={' Mainbox d-flex '}>
-
     <Categories/>
-   
-   
     </div>
    </>
   )};
