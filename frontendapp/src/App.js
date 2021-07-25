@@ -12,15 +12,47 @@ const { Panel } = Collapse;
 
   
 function Mynav(){
+ const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  
+
+
 return(
 <>
 <div className={' navBox row bg-dark border border-light justify-content-between p-1'}>
             <h1 className={'nav-item col-4 align-self-center  '}>MyForum</h1>
-            <h5 className={'nav-item col-4 align-self-center '}> Welcome! <span className={'text-white'}>Login</span></h5>
+            <h5 className={'nav-item col-4 align-self-center '}> Welcome! <span onClick={showModal}className={'text-white'}>Login</span></h5>
 
+        <Modal title="LOGIN"  visible={isModalVisible} closable={false} footer={null}>
+
+          <label>Username:</label>
+          <input type="text"  className={' form-control p-2 m-2 rounded'} placeholder={'Enter UserName'}></input>
+          <label>Password:</label>
+          <input  type="text"  className={' form-control p-2 m-2 rounded '} placeholder={'Enter Password'}></input>
+          <button className={'Q-btn p-2  m-2 w-100 text-light rounded'}> Register </button>
+      
+       <div className={'d-flex justify-content-end'}>
+       <button className={'Q-btn  align-self-center bg-secondary mx-3 my-2 rounded'} onClick={() =>setIsModalVisible(false)} >Cancel</button>
+       <button className={'Q-btn  align-self-center  rounded my-2'} onClick={() =>setIsModalVisible(false)} >Submit</button>
+           
+           
+       </div>
+      </Modal>
+     
 </div>
+
+
+
+
 </>
 )};
+
+
+
 
 
 function Categories(){
